@@ -185,33 +185,35 @@ namespace UnityEngine
         /// Print out the serialization data for the specified object.
         /// </summary>
         /// <param name="o">Object to serialize</param>
-        private void WriteObject(object o)
-        {
+       private void WriteObject(object o)
+       {
             switch (o)
             {
                 case null:
-                    throw new NotImplementedException("Fill me in");
+                    Write("null");
                     break;
 
                 case int i:
-                    throw new NotImplementedException("Fill me in");
+                    Write(i);
                     break;
 
                 case float f:
-                    throw new NotImplementedException("Fill me in");
+                    Write(f);
                     break;
 
                 // Not: don't worry about handling strings that contain quote marks
                 case string s:
-                    throw new NotImplementedException("Fill me in");
+                    Write('"');
+                    Write(s);
+                    Write('"');
                     break;
 
                 case bool b:
-                    throw new NotImplementedException("Fill me in");
+                    Write(b);
                     break;
 
                 case IList list:
-                    throw new NotImplementedException("Fill me in");
+                    WriteList(list);
                     break;
 
                 default:
@@ -231,7 +233,39 @@ namespace UnityEngine
         /// <param name="o">Object to serialize</param>
         private void WriteComplexObject(object o)
         {
-            throw new NotImplementedException("Fill me in");
+            var (id, isNew) = GetId(o);
+            
+            Write('#');
+            Write(id);
+            
+            if (isNew)
+            {
+                WriteBracketedExpression(
+                    "{ ",
+                    () =>
+                    {
+                        var type = o.GetType();
+                        
+                        // Write type field first
+                        Write("type: ");
+                        Write('"');
+                        Write(type.Name);
+                        Write('"');
+                        
+                        // Get all fields and write them
+                        var fields = Utilities.GetFieldNamesAndValues(o);
+                        
+                        foreach (var (fieldName, fieldValue) in fields)
+                        {
+                            Write(",");
+                            NewLine();
+                            Write(fieldName);
+                            Write(": ");
+                            WriteObject(fieldValue);
+                        }
+                    },
+                    " }");
+            }
         }
     }
 }
