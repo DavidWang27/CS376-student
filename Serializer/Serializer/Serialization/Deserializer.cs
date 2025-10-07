@@ -311,8 +311,8 @@ namespace UnityEngine
                     $"Expected a type name (a string) in 'type: ...' expression for object id {id}, but instead got {typeName}");
 
             // Great!  Now what?
-            // Create a new instance of this type
-            var obj = Utilities.CreateInstance(type);
+            // Create a new instance of this type using the correct method name
+            var obj = Utilities.MakeInstance(type);
             
             // Store it in the idTable BEFORE reading fields to handle circular references
             idTable[id] = obj;
@@ -322,8 +322,8 @@ namespace UnityEngine
             {
                 var (field, value) = ReadField(id);
                 // We've got a field and a value.  Now what?
-                // Set the field value on the object
-                Utilities.SetField(obj, field, value);
+                // Set the field value on the object using the correct method name
+                Utilities.SetFieldByName(obj, field, value);
             }
 
             if (End)
